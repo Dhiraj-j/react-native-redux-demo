@@ -1,10 +1,8 @@
-// Home.tsx
 import React, {useState, useEffect} from 'react';
 import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -30,12 +28,20 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
     (state: RootState) => state.user,
   );
 
+  const [refreshing, setRefreshing] = useState(false);
+
   useEffect(() => {
     dispatch(fetchUsers());
   }, [dispatch, currentPage]);
 
   const nextPage = () => {
     dispatch(setPage(currentPage + 1));
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    dispatch(fetchUsers());
+    setRefreshing(false);
   };
 
   return (
@@ -58,6 +64,8 @@ const Home: React.FC<HomeProps> = ({navigation}) => {
         )}
         ListEmptyComponent={<Text style={styles.noUsers}>No users found</Text>}
         keyExtractor={(item: User) => item.login.uuid}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
       {loading && <ActivityIndicator size="large" color={colors.primary} />}
     </View>
